@@ -26,9 +26,9 @@ export default function AdminDashboard() {
 
   const renderItem = ({ item }: { item: any }) => (
     <View style={styles.card}>
-      <Text style={styles.cardTitle}>{item.hemocentro} - {item.cidade}</Text>
+      <Text style={styles.cardTitle}>{item.hospital} - {item.cidade}</Text>
       <Text style={styles.cardText}>Tipo Sanguíneo: <Text style={styles.bold}>{item.tipo_sanguineo}</Text></Text>
-      <Text style={styles.cardText}>Nível: {item.nivel_critico}</Text>
+      <Text style={styles.cardText}>Nível: {item.urgencia}</Text>
       <Text style={styles.cardStatus}>{item.ativo ? "🟢 Ativo" : "🔴 Inativo"}</Text>
     </View>
   );

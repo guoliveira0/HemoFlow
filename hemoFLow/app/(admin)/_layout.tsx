@@ -4,7 +4,7 @@ export default function AdminLayout() {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ title: 'Painel Admin' }} />
-      <Stack.Screen name="create-alert" options={{ title: 'Novo Alerta' }} />
+      <Stack.Screen name="create-alert" options={{ headerShown: false, presentation: 'modal' }} />
     </Stack>
   );
 }
