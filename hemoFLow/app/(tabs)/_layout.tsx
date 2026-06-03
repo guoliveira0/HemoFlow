@@ -38,6 +38,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="agendamentos"
+        options={{
+          title: 'Agendar',
+          tabBarIcon: ({ color }) => <TabBarIcon name="calendar" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="notifications"
         options={{
           title: 'Alertas',

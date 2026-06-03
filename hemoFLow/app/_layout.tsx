@@ -1,3 +1,4 @@
+import 'react-native-url-polyfill/auto';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
@@ -8,6 +9,7 @@ import 'react-native-reanimated';
 import { ActivityIndicator, View } from 'react-native';
 
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
+import * as Notifications from 'expo-notifications';
 
 import { useColorScheme } from '@/components/useColorScheme';
 
@@ -24,6 +26,14 @@ export const unstable_settings = {
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
@@ -34,6 +44,16 @@ export default function RootLayout() {
   useEffect(() => {
     if (error) throw error;
   }, [error]);
+
+  useEffect(() => {
+    async function configureNotifications() {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Notification permission not granted');
+      }
+    }
+    configureNotifications();
+  }, []);
 
   useEffect(() => {
     if (loaded) {

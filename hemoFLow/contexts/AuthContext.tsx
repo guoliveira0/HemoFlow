@@ -14,14 +14,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("AuthContext: fetching session...");
     supabase.auth.getSession().then(({ data: { session }, error }) => {
+      console.log("AuthContext: session fetched", session ? "yes" : "no", error);
       if (error) {
         console.error('Error getting session', error);
       }
       setSession(session);
       setLoading(false);
     }).catch(err => {
-      console.error(err);
+      console.error("AuthContext: error", err);
       setLoading(false);
     });
 

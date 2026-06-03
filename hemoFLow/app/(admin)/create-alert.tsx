@@ -11,10 +11,11 @@ export default function CreateAlertScreen() {
   const router = useRouter();
   const { session } = useAuth();
   
-  const [hemocentro, setHemocentro] = useState('');
+  const [hemocentro, setHemocentro] = useState('Hemocentro do Norte de Minas');
   const [cidade, setCidade] = useState('Montes Claros'); // Pode ser pego do perfil
   const [tipoSanguineo, setTipoSanguineo] = useState('O-');
   const [nivel, setNivel] = useState('Urgente');
+  const [quantidadeBolsas, setQuantidadeBolsas] = useState('');
   const [mensagem, setMensagem] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -49,6 +50,7 @@ export default function CreateAlertScreen() {
         hospital: hemocentro,
         cidade: cidade || 'Local desconhecido',
         tipo_sanguineo: tipoSanguineo,
+        quantidade_bolsas: quantidadeBolsas ? parseInt(quantidadeBolsas, 10) : null,
         urgencia: nivel,
         mensagem: mensagem,
         ativo: true
@@ -109,11 +111,20 @@ export default function CreateAlertScreen() {
           {/* Hospital / Hemocentro */}
           <Text style={styles.label}>Hospital / hemocentro</Text>
           <TextInput 
-            style={styles.input} 
-            onChangeText={setHemocentro} 
+            style={[styles.input, { backgroundColor: '#333', color: '#AAA' }]} 
             value={hemocentro} 
-            placeholder="Ex: Santa Casa de Montes Claros" 
+            editable={false}
+          />
+
+          {/* Quantidade de Bolsas */}
+          <Text style={styles.label}>Quantidade de bolsas (Opcional)</Text>
+          <TextInput 
+            style={styles.input} 
+            onChangeText={setQuantidadeBolsas} 
+            value={quantidadeBolsas} 
+            placeholder="Ex: 5" 
             placeholderTextColor="#888"
+            keyboardType="numeric"
           />
 
           {/* Nível de Urgência */}

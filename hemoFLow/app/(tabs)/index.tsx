@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../src/lib/supabase';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 
 export default function TabOneScreen() {
   const { session } = useAuth();
@@ -19,11 +20,13 @@ export default function TabOneScreen() {
   const [lastDonationDateText, setLastDonationDateText] = useState('Nunca');
   const [nextDonationDateText, setNextDonationDateText] = useState('Hoje');
 
-  useEffect(() => {
-    if (session?.user?.id) {
-      loadData();
-    }
-  }, [session]);
+  useFocusEffect(
+    useCallback(() => {
+      if (session?.user?.id) {
+        loadData();
+      }
+    }, [session])
+  );
 
   const loadData = async () => {
     setLoading(true);
@@ -182,17 +185,29 @@ export default function TabOneScreen() {
           <Text style={styles.alertDescription}>
             {alert.hospital} precisa de <Text style={styles.alertBold}>{alert.tipo_sanguineo}</Text> em nível crítico.
           </Text>
-          <TouchableOpacity style={styles.alertButton}>
+          <TouchableOpacity style={styles.alertButton} onPress={() => router.push('/(tabs)/agendamentos' as any)}>
             <Text style={styles.alertButtonText}>Vou doar agora ↗</Text>
           </TouchableOpacity>
         </View>
       )}
 
+      {/* Informativo / Guia de Doação */}
+      <TouchableOpacity style={styles.guideCard} onPress={() => router.push('/cuidados' as any)}>
+        <View style={styles.guideContent}>
+          <Ionicons name="information-circle" size={32} color="#FFF" />
+          <View style={{ marginLeft: 12, flex: 1 }}>
+            <Text style={styles.guideTitle}>Guia de Doação</Text>
+            <Text style={styles.guideSub}>Veja os cuidados pré e pós-doação</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={24} color="#FFF" />
+        </View>
+      </TouchableOpacity>
+
       {/* Secão: Hemocentros Próximos */}
       <View style={styles.nearbySection}>
         <Text style={styles.nearbyTitle}>Hemocentros próximos</Text>
 
-        <View style={styles.hospitalRow}>
+        <View style={[styles.hospitalRow, { borderBottomWidth: 0 }]}>
           <View>
             <Text style={styles.hospitalName}>Hemocentro MG Norte</Text>
             <Text style={styles.hospitalInfo}>Seg-Sex · 7h-17h</Text>
@@ -201,19 +216,6 @@ export default function TabOneScreen() {
             <Text style={styles.distance}>1,2 km</Text>
             <View style={styles.badgeCritico}>
               <Text style={styles.badgeCriticoText}>Crítico</Text>
-            </View>
-          </View>
-        </View>
-
-        <View style={[styles.hospitalRow, { borderBottomWidth: 0 }]}>
-          <View>
-            <Text style={styles.hospitalName}>UPA Central</Text>
-            <Text style={styles.hospitalInfo}>24 horas</Text>
-          </View>
-          <View style={styles.hospitalRight}>
-            <Text style={styles.distance}>3,4 km</Text>
-            <View style={styles.badgeNormal}>
-              <Text style={styles.badgeNormalText}>Normal</Text>
             </View>
           </View>
         </View>
@@ -232,6 +234,28 @@ const styles = StyleSheet.create({
     backgroundColor: '#1E1E1E',
     padding: 20,
     paddingTop: 50,
+  },
+  guideCard: {
+    backgroundColor: '#D32F2F',
+    borderRadius: 12,
+    marginBottom: 24,
+    overflow: 'hidden',
+  },
+  guideContent: {
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  guideTitle: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  guideSub: {
+    color: '#FFCDD2',
+    fontSize: 13,
   },
   header: {
     flexDirection: 'row',

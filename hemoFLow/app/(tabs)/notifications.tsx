@@ -108,6 +108,7 @@ export default function NotificationScreen() {
             const bloodColor = ['O-', 'O+'].includes(alert.tipo_sanguineo) ? '#8B0000' : '#1976D2';
             const voluntariosCount = alert.confirmacoes ? alert.confirmacoes.length : 0;
             const hasConfirmed = alert.confirmacoes?.some((c: any) => c.doador_id === session?.user?.id);
+            const goalReached = alert.quantidade_bolsas ? voluntariosCount >= alert.quantidade_bolsas : false;
 
             return (
               <View 
@@ -155,33 +156,45 @@ export default function NotificationScreen() {
                     <Text style={[styles.author, isUrgent ? { color: '#8B0000' } : { color: '#888' }]}>
                       por {alert.profiles?.nome || 'Hemocentro'} · {alert.cidade}
                     </Text>
-                    {voluntariosCount > 0 && (
+                    {alert.quantidade_bolsas ? (
                       <Text style={[{ fontSize: 12, marginTop: 4, fontWeight: 'bold' }, isUrgent ? { color: '#B71C1C' } : { color: '#4CAF50' }]}>
-                        ✓ {voluntariosCount} {voluntariosCount === 1 ? 'pessoa vai doar' : 'pessoas vão doar'}
+                        ✓ {voluntariosCount} / {alert.quantidade_bolsas} {alert.quantidade_bolsas === 1 ? 'bolsa arrecadada' : 'bolsas arrecadadas'}
                       </Text>
+                    ) : (
+                      voluntariosCount > 0 && (
+                        <Text style={[{ fontSize: 12, marginTop: 4, fontWeight: 'bold' }, isUrgent ? { color: '#B71C1C' } : { color: '#4CAF50' }]}>
+                          ✓ {voluntariosCount} {voluntariosCount === 1 ? 'pessoa vai doar' : 'pessoas vão doar'}
+                        </Text>
+                      )
                     )}
                   </View>
                   
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={[
-                      styles.actionButton, 
+                      styles.actionButton,
                       isUrgent ? styles.actionButtonUrgent : styles.actionButtonNormal,
-                      hasConfirmed && { opacity: 0.5 }
+                      hasConfirmed && { backgroundColor: '#2A2A2A', borderColor: '#4CAF50', borderWidth: 1 },
+                      !hasConfirmed && (profile?.tipo_sanguineo?.trim().toUpperCase() !== alert.tipo_sanguineo?.trim().toUpperCase() || goalReached) && { backgroundColor: '#555' }
                     ]}
-                    disabled={hasConfirmed}
+                    disabled={!hasConfirmed && (profile?.tipo_sanguineo?.trim().toUpperCase() !== alert.tipo_sanguineo?.trim().toUpperCase() || goalReached)}
                     onPress={() => {
                       if (!hasConfirmed) {
                         setSelectedAlert(alert);
                         setIsConfirmed(false);
                         setShowConquista(false);
+                      } else {
+                        // Se já confirmou, leva ele direto para o QR Code
+                        router.push({ pathname: '/qr-code/[alertaId]', params: { alertaId: alert.id }});
                       }
                     }}
                   >
                     <Text style={[
                       styles.actionButtonText,
-                      isUrgent ? styles.actionButtonTextUrgent : styles.actionButtonTextNormal
+                      isUrgent ? styles.actionButtonTextUrgent : styles.actionButtonTextNormal,
+                      hasConfirmed && { color: '#4CAF50' },
+                      !hasConfirmed && (profile?.tipo_sanguineo?.trim().toUpperCase() !== alert.tipo_sanguineo?.trim().toUpperCase() || goalReached) && { color: '#999' }
                     ]}>
-                      {hasConfirmed ? 'Confirmado ✓' : 'Quero ajudar'}
+                      {hasConfirmed ? 'Mostrar QR Code' : (goalReached ? 'Meta alcançada' : (profile?.tipo_sanguineo?.trim().toUpperCase() === alert.tipo_sanguineo?.trim().toUpperCase() ? 'Quero ajudar' : 'Incompatível'))}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -344,8 +357,11 @@ export default function NotificationScreen() {
                     <Text style={styles.comoChegarText}>Como chegar</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity style={styles.agendaButton}>
-                    <Text style={styles.agendaButtonText}>Adicionar na{'\n'}agenda</Text>
+                  <TouchableOpacity 
+                    style={styles.agendaButton}
+                    onPress={() => router.push({ pathname: '/qr-code/[alertaId]', params: { alertaId: selectedAlert.id }})}
+                  >
+                    <Text style={styles.agendaButtonText}>Mostrar QR{'\n'}no Local</Text>
                   </TouchableOpacity>
                 </View>
 
